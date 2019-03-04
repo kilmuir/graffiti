@@ -17,3 +17,7 @@ Visual design is also an important element of interactive mapping. Roth (2017) w
 
 <img src = 'https://kilmuir.github.io/graffiti/Screen Shot 2019-03-03 at 4.12.42 PM.png'>
 
+## References
+
+Roth, R. E. (2017). User Interface and User Experience (UI/UX) Design. *The Geographic Information Science & Technology Body of Knowledge* (2nd Quarter 2017 Edition), John P. Wilson (ed.). DOI: 10.22224/gistbok/2017.2.5 (Links to an external site.)Links to an external site.
+
