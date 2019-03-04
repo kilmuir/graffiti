@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Graffiti and Public Art</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+      }
+
+      #map {
+        position: relative;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      h1 {
+        font-size: 20px;
+        line-height: 30px;
+      }
+      h2 {
+        font-size: 14px;
+        line-height: 20px;
+        margin-bottom: 10px;
+      }
+      a {
+        text-decoration: none;
+        color: #2dc4b2;
+      }
+      #console {
+        position: absolute;
+        width: 240px;
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: white;
+      }
+    </style>
+</head>
+<body>
+  <style>
+  body {
+  overflow: hidden;
+  }
+
+  body * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  }
+
+  .map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  }
+
+  </style>
+  <div id = 'map'></div>
+    <div id='map'></div>
+
+  <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.1.0/mapbox-gl-compare.js'></script>
+  <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.1.0/mapbox-gl-compare.css' type='text/css' />
+
+  <div id='before' class='map'></div>
+  <div id='after' class='map'></div>
+
+  <div id = 'console' class = "front">
+    <h1>Graffiti and Public art in Vancouver</h1>
+    <p>Heatmap: left (blue) is public art, right (green) is graffiti.</p>
+    <p>Data: <a href = 'https://data.vancouver.ca/datacatalogue/communityGardens.htm' title = "City of Vancouver"
+    target = "_blank"> CofV</a>, current as of March 2019</p>
+  </div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1Ijoia2lkY3VycnkiLCJhIjoiY2pydmZ3NmcwMDFvYTQ0bzlzNXVxYXdxeSJ9.KFeGYPOec-Me0i1PiBetXQ';
+
+    var artmap = new mapboxgl.Map({
+      container: 'before',
+      style: 'mapbox://styles/mapbox/dark-v10',
+      center: [-123.1, 49.25],
+      zoom: 11
+    });
+    artmap.on('load', function() {
+
+      artmap.addSource('publicart', {
+        type: 'geojson',
+        data: './public_art1.geojson'
+      });
+      artmap.addLayer({
+  id: 'art-heat',
+  type: 'heatmap',
+  source: 'publicart',
+  maxzoom: 22,
+  paint: {
+
+    'heatmap-weight': {
+      property: 'size',
+      type: 'exponential',
+      stops: [
+        [0, 0],
+        [1, 1]
+      ]
+    },
+    // increase intensity as zoom level increases
+    'heatmap-intensity': {
+      stops: [
+        [11, 1],
+        [22, 3]
+      ]
+    },
+    // assign color values be applied to points depending on their density
+    'heatmap-color': [
+      'interpolate',
+      ['linear'],
+      ['heatmap-density'],
+      0, 'rgba(236,222,239,0)',
+      0.2, 'rgb(208,209,230)',
+      0.4, 'rgb(166,189,219)',
+      0.6, 'rgb(103,169,207)',
+      0.8, 'rgb(28,144,153)'
+    ],
+    // increase radius as zoom increases
+    'heatmap-radius': {
+      stops: [
+        [11, 15],
+        [22, 30]
+      ]
+    },
+    // decrease opacity to transition into the circle layer
+    'heatmap-opacity': {
+      default: 1,
+      stops: [
+        [14, 1],
+        [15, 0]
+      ]
+    },
+  }
+}, 'waterway-label');
+});
+
+  var graffitimap = new mapboxgl.Map({
+    container: 'after',
+    style: 'mapbox://styles/mapbox/dark-v9',
+    center: [-123.1, 49.25],
+    zoom: 11
+  });
+  graffitimap.on('load', function() {
+  graffitimap.addSource('grafitti', {
+      type: 'geojson',
+      data: './graffiti.geojson'
+    });
+    graffitimap.addLayer({
+      id: 'grafitti-heat',
+      type: 'heatmap',
+      source: 'grafitti',
+      maxzoom: 22,
+      paint: {
+        // increase weight as diameter breast height increases
+        'heatmap-weight': {
+          property: 'count',
+          type: 'exponential',
+          stops: [
+            [1, 0],
+            [35, 1]
+          ]
+        },
+        // increase intensity as zoom level increases
+        'heatmap-intensity': {
+          stops: [
+            [11, 1],
+            [22, 3]
+          ]
+        },
+        // assign color values be applied to points depending on their density
+        'heatmap-color': [
+          'interpolate',
+          ['linear'],
+          ['heatmap-density'],
+          0, 'rgba(237,248,251,0)',
+          0.2, 'rgb(178,226,226)',
+          0.4, 'rgb(102,194,164)',
+          0.6, 'rgb(44,162,95)',
+          0.8, 'rgb(0,109,44)'
+        ],
+        // increase radius as zoom increases
+        'heatmap-radius': {
+          stops: [
+            [11, 15],
+            [22, 30]
+          ]
+        },
+        // decrease opacity to transition into the circle layer
+        'heatmap-opacity': {
+          default: 1,
+          stops: [
+            [14, 1],
+            [15, 0]
+          ]
+        },
+      }
+    }, 'waterway-label');
+
+    });
+    var map = new mapboxgl.Compare(artmap, graffitimap, {
+});
+
+  </script>
+</body>
+</html>
